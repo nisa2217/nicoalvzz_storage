@@ -1,0 +1,25 @@
+---
+- name: Configurar permisos y propietario de archivos de Nginx
+  hosts: all
+  become: yes  # Usar sudo para tareas administrativas
+  tasks:
+    - name: Asegurar que el archivo de configuración principal tiene permisos correctos
+      file:
+        path: /etc/nginx/nginx.conf  # Archivo de configuración principal de Nginx
+        owner: root                 # Propietario del archivo
+        group: root                 # Grupo del archivo
+        mode: '0644'                # Permisos: rw-r--r-- (lectura y escritura solo para root)
+        state: file
+
+    - name: Asegurar permisos en el directorio de configuraciones adicionales
+      file:
+        path: /etc/nginx/conf.d/    # Directorio con configuraciones adicionales
+        owner: root                 # Propietario
+        group: root                 # Grupo
+        mode: '0755'                # Permisos: rwxr-xr-x
+        state: directory            # Asegura que es un directorio
+
+    - name: Reiniciar Nginx si se han modificado los archivos
+      service:
+        name: nginx
+        state: restarted
